@@ -1,20 +1,33 @@
 import os
-import httpx
-import ollama
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from openai import OpenAI
+from typing import List, Optional
 from databases import Database
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Boolean
-
-
-OLLAMA_API_URL=os.getenv("OLLAMA_API_URL", "http://localhost:11434")
 
 DATABASE_URL = "sqlite:///./test.db"
 database = Database(DATABASE_URL)
 
 app = FastAPI()
+
+## chatgpt client begin
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+
+class ChatRequest(BaseModel):
+    message: str
+    temperature: Optional[float] = 0.7
+    max_tokens: Optional[int] = 150
+    model: Optional[str] = "gpt-3.5-turbo"
+
+class ChatResponse(BaseModel):
+    response: str
+    usage: Optional[dict] = None
+
+## chat gpt client end
+
 
 origins = [
     "http://localhost",
@@ -23,10 +36,6 @@ origins = [
     "https://127.0.0.1:5173",
     "http://localhost:5173",
     "https://localhost:5173",
-    "http://127.0.0.1:11434",
-    "http://localhost:11434",
-    "http://localhost:*",
-    "*",
 ]
 
 app.add_middleware(
@@ -59,36 +68,51 @@ class HelloResponse(BaseModel):
 class HomeResponse(BaseModel):
     message: str
     
-import json
+class ChatMessage(BaseModel):
+    text: str
 
-@app.post("/search")
-async def search(query: dict):
-    async with httpx.AsyncClient(timeout=None) as client:
-            page = await client.get(f"{query.get('query')}")
-            
-            print("page fetched: ")
-            print(page)
-            print(" * " * 10)
-            
-            response = await client.post(
-                f"{OLLAMA_API_URL}/api/generate",
-                json={
-                    "model": "llama3.2:3b-instruct-fp16",
-                    "prompt": "convert this html page into human readable words: {}".format(page)
-                }
-            )
-            print("query: ")
-            print(query)
-            print("RESPONSE OF OLLAMA: ")
-            print(response.get("content"))
-            decoded = response.content.decode('utf-8')
-            jdecoded = json.loads(decoded)
-            print("json conversion below:")
-            print(jdecoded)
-            return response
-        
-    
-    # return {"results": f"Search results for: {query}"}
+@app.post("/chat")
+async def chat(message: ChatMessage):
+    try:
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "user", "content": message.text}
+            ],
+            temperature=0.7,
+            max_tokens=150
+        )
+
+        return {
+            "response": response.choices[0].message.content,
+            "status": "success"
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/search", response_model=ChatResponse)
+async def chat_endpoint(request: ChatRequest):
+    print("request:")
+    print(request)
+    try:
+        response = client.chat.completions.create(
+            model=request.model,
+            messages=[
+                {"role": "user", "content": request.message}
+            ],
+            temperature=request.temperature,
+            max_tokens=request.max_tokens
+        )
+
+        return ChatResponse(
+            response=response.choices[0].message.content,
+            usage=response.usage
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.get("/hello", response_model=HelloResponse)
 async def hello():
