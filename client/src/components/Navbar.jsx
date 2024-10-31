@@ -19,10 +19,10 @@ function Navbar() {
               About
             </Link>
             <Link 
-              to="/todos" 
+              to="/chat" 
               className="px-3 py-2 rounded-md hover:bg-gray-700 transition-colors"
             >
-              Todos
+              Chat
             </Link>
           </div>
         </div>
