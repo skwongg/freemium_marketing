@@ -22,7 +22,7 @@ function ChatInterface() {
 
       dispatch(addMessage({
         id: Date.now(),
-        text: `Searching for: ${searchQuery}`,
+        text: `Searching for company: ${searchQuery}`,
         sender: 'user',
         timestamp: new Date().toISOString(),
       }));
@@ -30,7 +30,7 @@ function ChatInterface() {
       if (performSearch.fulfilled.match(resultAction)) {
         dispatch(addMessage({
           id: Date.now() + 1,
-          text: `Search Results: ${JSON.stringify(resultAction.payload, null, 2)}`,
+          text: `Search Results for Company: ${JSON.stringify(resultAction.payload, null, 2)}`,
           sender: 'bot',
           timestamp: new Date().toISOString(),
         }));
@@ -80,7 +80,7 @@ function ChatInterface() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full px-4 py-2 pr-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Search..."
+              placeholder="Web Domain"
             />
             <button
               type="submit"
