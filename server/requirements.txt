@@ -1,5 +1,10 @@
-fastapi>=0.68.0,<0.69.0
-uvicorn>=0.15.0,<0.16.0
+fastapi
+uvicorn
 pydantic
 databases[sqlite]
 sqlite-utils
+langchain
+chromadb # Vector storage
+pytest
+ollama
+gpt-researcher

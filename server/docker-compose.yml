@@ -10,3 +10,4 @@ services:
       retries: 3
     environment:
       DATABASE_URL: "sqlite:///./test.db"
+      OLLAMA_API_URL: "http://host.docker.internal:11434"  # This allows container to access host's Ollama
