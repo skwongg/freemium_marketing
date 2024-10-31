@@ -58,20 +58,37 @@ class HelloResponse(BaseModel):
     
 class HomeResponse(BaseModel):
     message: str
+    
+import json
 
 @app.post("/search")
 async def search(query: dict):
-    print("* " * 10)
-    print(query.get('query'))
-    a = (call_ollama(query.get('query')))
-    print(a)
-    print(" ( )" * 10)
-    print(a)
+    async with httpx.AsyncClient(timeout=None) as client:
+            page = await client.get(f"{query.get('query')}")
+            
+            print("page fetched: ")
+            print(page)
+            print(" * " * 10)
+            
+            response = await client.post(
+                f"{OLLAMA_API_URL}/api/generate",
+                json={
+                    "model": "llama3.2:3b-instruct-fp16",
+                    "prompt": "convert this html page into human readable words: {}".format(page)
+                }
+            )
+            print("query: ")
+            print(query)
+            print("RESPONSE OF OLLAMA: ")
+            print(response.get("content"))
+            decoded = response.content.decode('utf-8')
+            jdecoded = json.loads(decoded)
+            print("json conversion below:")
+            print(jdecoded)
+            return response
+        
     
-    print("all the things happened already.")
-    
-    
-    return {"results": f"Search results for: {query}"}
+    # return {"results": f"Search results for: {query}"}
 
 @app.get("/hello", response_model=HelloResponse)
 async def hello():
@@ -84,26 +101,3 @@ async def home():
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
-
-
-@app.post("/chat")
-async def call_ollama(message: dict):
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            f"{OLLAMA_API_URL}/api/generate",
-            json={
-                "model": "llama2",
-                "prompt": message["text"]
-            }
-        )
-        print("RESPONE OF OLLAMA: ")
-        print(response.json())
-        return response.json()
-
-# def call_ollama(prompt):
-#     print("ollama is fine")
-#     resp = ollama.chat(model='mistral', messages=[{'role': 'user', 'content': 'Why is the sky blue?'}])
-#     print('ollama returned even')
-#     return resp
-    
-    
