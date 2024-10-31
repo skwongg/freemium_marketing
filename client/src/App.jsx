@@ -1,10 +1,11 @@
+// src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from './store';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import About from './pages/About';
-import TodoList from './pages/TodoList';
+import ChatInterface from './pages/ChatInterface';
 
 function App() {
   return (
@@ -12,11 +13,11 @@ function App() {
       <Router>
         <div className="min-h-screen bg-gray-100 flex flex-col">
           <Navbar />
-          <main className="flex-grow container mx-auto px-4 py-8">
+          <main className="flex-grow">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
-              <Route path="/todos" element={<TodoList />} />
+              <Route path="/chat" element={<ChatInterface />} />
             </Routes>
           </main>
         </div>
