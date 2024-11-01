@@ -6,7 +6,8 @@ export const sendMessage = createAsyncThunk(
   'chat/sendMessage',
   async (message) => {
     const response = await axios.post('http://localhost:8000/chat', {
-      text: message
+      text: message,
+      domain: message
     });
     return response.data;
   }

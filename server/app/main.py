@@ -1,5 +1,5 @@
 import os
-
+import requests
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -45,7 +45,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 metadata = MetaData()
 # Define a sample table
 items = Table(
@@ -69,15 +68,38 @@ class HomeResponse(BaseModel):
     message: str
     
 class ChatMessage(BaseModel):
+    domain: str
     text: str
 
 @app.post("/chat")
 async def chat(message: ChatMessage):
+    
     try:
+        # PSEUDOCODE context call given domain
+            # http request the domain website
+            # take HTML and feed into prompt as `initial`
+        # html_page = requests.get("https://www.linkedin.com") #TODO: pipe through the domain
+        
+        initial = "airbnb travel travigo template info"
+        feed = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "user", "content": initial}
+            ],
+            temperature=0.7,
+            max_tokens=4000
+        )
+        
+        # take feed text and send into prompt for audience target 
+        
+        
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "user", "content": message.text}
+                {"role": "user", "content": "give me the industries and job titles \
+                    of people in ads given the context of and then generate two marketing \
+                    blurbs for them respectively \
+                        :{}".format(feed) + message.text}
             ],
             temperature=0.7,
             max_tokens=4000
