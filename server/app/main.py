@@ -80,7 +80,8 @@ async def chat(message: ChatMessage):
             # take HTML and feed into prompt as `initial`
         # html_page = requests.get("https://www.linkedin.com") #TODO: pipe through the domain
         
-        initial = "airbnb travel travigo template info"
+        initial = "airbnb.com travigo template info" #this should have been cleaned html
+        initial = "linkedin.com linkedin Welcome to your professional community" #this should have been cleaned html
         feed = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -90,8 +91,17 @@ async def chat(message: ChatMessage):
             max_tokens=4000
         )
         
-        # take feed text and send into prompt for audience target 
+        # take feed text and send into prompt for audience target
+            # prompt for domain company industry
+            # prompt for domain company revenue or financials
+            # prompt for domain company sales
+            # prompt for any other relevant context here
+            
+        # prompt for structured response clearly defining each 
+        # ideally as a prefix to next prompt "given the company <company>, 
+        # in the <industry> industry and the people who would buy <what they sell>"
         
+        # send into the next prompt to generate copy.
         
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
@@ -115,8 +125,6 @@ async def chat(message: ChatMessage):
 
 @app.post("/search", response_model=ChatResponse)
 async def chat_endpoint(request: ChatRequest):
-    print("request:")
-    print(request)
     try:
         response = client.chat.completions.create(
             model=request.model,
