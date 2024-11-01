@@ -80,7 +80,7 @@ async def chat(message: ChatMessage):
                 {"role": "user", "content": message.text}
             ],
             temperature=0.7,
-            max_tokens=150
+            max_tokens=4000
         )
 
         return {

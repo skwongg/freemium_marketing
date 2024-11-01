@@ -6,7 +6,7 @@ export const performSearch = createAsyncThunk(
   'search/performSearch',
   async (searchQuery) => {
     try {
-      const response = await axios.post('http://127.0.0.1:8000/search', {
+      const response = await axios.post('http://127.0.0.1:8000/chat', {
         query: searchQuery,
         headers: {"Access-Control-Allow-Origin": "*"}
       });
