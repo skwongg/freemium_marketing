@@ -11,3 +11,11 @@ services:
     environment:
       DATABASE_URL: "sqlite:///./test.db"
       OLLAMA_API_URL: "http://host.docker.internal:11434"  # This allows container to access host's Ollama
+
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    volumes:
+      - ./models:/var/lib/ollama
+    ports:
+      - "11434:11434"

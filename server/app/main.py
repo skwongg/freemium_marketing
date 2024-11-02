@@ -9,7 +9,7 @@ from databases import Database
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Boolean
 
 
-OLLAMA_API_URL=os.getenv("OLLAMA_API_URL", "http://localhost:11434")
+OLLAMA_API_URL=os.getenv("OLLAMA_API_URL", "http://host.docker.internal:11434")
 
 DATABASE_URL = "sqlite:///./test.db"
 database = Database(DATABASE_URL)
@@ -63,12 +63,17 @@ class HomeResponse(BaseModel):
 async def search(query: dict):
     print("* " * 10)
     print(query.get('query'))
-    a = (call_ollama(query.get('query')))
-    print(a)
-    print(" ( )" * 10)
-    print(a)
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+                f"{OLLAMA_API_URL}/api/generate",
+                json={
+                    "model": "llama2",
+                    "prompt": query.get('query')
+                }
+            )
+        print("RESPONE OF OLLAMA: ")
+        print(response.json())
     
-    print("all the things happened already.")
     
     
     return {"results": f"Search results for: {query}"}
