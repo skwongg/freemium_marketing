@@ -6,5 +6,4 @@ sqlite-utils
 langchain
 chromadb # Vector storage
 pytest
-ollama
-gpt-researcher
+langchain_community
