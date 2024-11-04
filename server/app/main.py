@@ -19,6 +19,7 @@ app = FastAPI()
 origins = [
     "http://localhost",
     "http://localhost:8080",
+    "http://localhost:8000",
     "http://127.0.0.1:5173",
     "https://127.0.0.1:5173",
     "http://localhost:5173",
@@ -26,6 +27,7 @@ origins = [
     "http://127.0.0.1:11434",
     "http://localhost:11434",
     "http://localhost:*",
+    "http://host.docker.internal:8000",
     "*",
 ]
 
@@ -67,11 +69,11 @@ async def search(query: dict):
         response = await client.post(
                 f"{OLLAMA_API_URL}/api/generate",
                 json={
-                    "model": "llama2",
+                    "model": "llama3.2",
                     "prompt": query.get('query')
                 }
             )
-        print("RESPONE OF OLLAMA: ")
+        print("RESPONSE OF OLLAMA: ")
         print(response.json())
     
     
@@ -97,18 +99,10 @@ async def call_ollama(message: dict):
         response = await client.post(
             f"{OLLAMA_API_URL}/api/generate",
             json={
-                "model": "llama2",
+                "model": "llama3.2",
                 "prompt": message["text"]
             }
         )
         print("RESPONE OF OLLAMA: ")
         print(response.json())
         return response.json()
-
-# def call_ollama(prompt):
-#     print("ollama is fine")
-#     resp = ollama.chat(model='mistral', messages=[{'role': 'user', 'content': 'Why is the sky blue?'}])
-#     print('ollama returned even')
-#     return resp
-    
-    

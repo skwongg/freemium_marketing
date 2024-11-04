@@ -12,10 +12,25 @@ services:
       DATABASE_URL: "sqlite:///./test.db"
       OLLAMA_API_URL: "http://host.docker.internal:11434"  # This allows container to access host's Ollama
 
-  ollama:
-    image: ollama/ollama:latest
-    restart: unless-stopped
+  openWebUI:
+    image: ghcr.io/open-webui/open-webui:main
+    restart: always
+    ports:
+      - "3000:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
-      - ./models:/var/lib/ollama
+      - open-webui-local:/app/backend/data
+
+  ollama:
+    image: ollama/ollama:0.1.34
     ports:
       - "11434:11434"
+    volumes:
+      - ollama-local:/root/.ollama
+
+volumes:
+  ollama-local:
+    external: true
+  open-webui-local:
+    external: true
