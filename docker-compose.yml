@@ -12,19 +12,32 @@ services:
       - NODE_ENV=development
     command: npm run dev -- --host 0.0.0.0
   
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=your_username
+      - POSTGRES_PASSWORD=your_password
+      - POSTGRES_DB=your_database_name
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   api:
     build: 
       context: ./server
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+    depends_on:
+      - postgres
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
     environment:
-      DATABASE_URL: "sqlite:///./test.db"
+      DATABASE_URL: "postgresql://your_username:your_password@postgres:5432/your_database_name"
       OLLAMA_API_URL: "http://host.docker.internal:11434"  # This allows container to access host's Ollama
 
   openWebUI:
@@ -49,6 +62,7 @@ volumes:
     external: true
   open-webui-local:
     external: true
+  postgres_data:
 
 networks:
   shared-network:

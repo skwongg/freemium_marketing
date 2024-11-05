@@ -5,14 +5,17 @@ import requests
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from databases import Database
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Boolean
-
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 
 OLLAMA_API_URL=os.getenv("OLLAMA_API_URL", "http://host.docker.internal:11434")
+DATABASE_URL = "postgresql://your_username:your_password@postgres:5432/your_database_name"
 
-DATABASE_URL = "sqlite:///./test.db"
-database = Database(DATABASE_URL)
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base() #sqlalchemy base class to create models/classes from.
+
 
 app = FastAPI()
 

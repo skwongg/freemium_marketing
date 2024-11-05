@@ -1,8 +1,6 @@
 fastapi
 uvicorn
 pydantic
-databases[sqlite]
-sqlite-utils
 langchain
 chromadb # Vector storage
 pytest
