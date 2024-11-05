@@ -61,30 +61,15 @@ class HelloResponse(BaseModel):
 class HomeResponse(BaseModel):
     message: str
 
-@app.post("/search")
-async def search(query: dict):
-    print("* " * 10)
-    print(query.get('query'))
-    # response = requests.post(url=f"{OLLAMA_API_URL}/api/generate", json={"model": "llama3.2","prompt": query.get('query')}, stream=False)
-    messages = [
-        {"role": "user", "content" : f"who do you think buys stuff from {query.get('query')}?"}
-    ]
-    response = requests.post(url=f"{OLLAMA_API_URL}/api/chat", json={"model": "llama3.2", "messages": messages}, stream=False)
 
-    
-    try:
-        for line in response.iter_lines():
-            if line:
-                # Each line is expected to be a valid JSON object
-                data = json.loads(line)
-                print("data in line: ")
-                # Process your data here
-                print(data)  # Print or otherwise process each JSON object
-    except json.JSONDecodeError as e:
-        print(f"Failed to decode JSON: {e}")
-    
-    
-    return {"results": f"Search results for: {query}"}
+import ollama 
+client = ollama.Client("http://host.docker.internal:11434")
+
+
+@app.post("/search")
+async def search(query: dict):    
+    response = client.generate(model="llama3.2", prompt="what do you know about: {}?".format(query.get('query')))
+    return {"results": response.get('response')}
 
 @app.get("/hello", response_model=HelloResponse)
 async def hello():
